@@ -36,7 +36,7 @@ import { PublicKey } from "@solana/web3.js";
 import { useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
 import { useAppKitConnection } from '@reown/appkit-adapter-solana/react'
 import type { Provider } from '@reown/appkit-adapter-solana/react';
-
+import supabase from "../testToken/database";
 
 type StatItem = {
   label: string;
@@ -492,32 +492,43 @@ export default function TradingInterface() {
       if (!walletPublicKey) {
         throw new Error("Please connect your wallet!");
       }
-      console.log(pairData.baseToken);
-      const price = parseFloat(parseFloat(pairData.priceNative).toFixed(9));
-      const tokenAmount =
-        +orderAmount / parseFloat(parseFloat(pairData.priceNative).toFixed(9));
-      const tokenName = pairData.baseToken.symbol;
-      const tokenMint = pairData.baseToken.address;
+
+      const tokenAmount = +orderAmount / parseFloat(pairData.priceNative);
+      const transactionValueUsd = tokenAmount * parseFloat(pairData.priceUsd);
+
       const buyNow = await buy(
         +orderAmount,
         walletPublicKey,
-        tokenName,
-        tokenMint,
+        pairData.baseToken.name, // Correctly pass the name
+        pairData.baseToken.address,
         tokenAmount,
       );
 
-      if (!connection) return;
-      // Send the transaction
+      if (!connection || !walletProvider) return;
       const signature = await walletProvider.sendTransaction(buyNow, connection);
 
-      // Confirm the transaction
-      // const confirmation = await connection.confirmTransaction(signature, 'confirmed');
-      console.log(buyNow);
-      console.log(
-        `Buying ${orderAmount} ${pairData?.baseToken.symbol} at ${price}`
-      );
+      // --- LOG TRADE TO SUPABASE ---
+      const { error: logError } = await supabase.from('trade_history').insert({
+        user_wallet: walletPublicKey.toBase58(),
+        trade_type: 'buy',
+        base_token_mint: pairData.baseToken.address,
+        base_token_symbol: pairData.baseToken.symbol,
+        base_token_amount: tokenAmount,
+        quote_token_symbol: 'XSOL',
+        quote_token_amount: +orderAmount,
+        transaction_value_usd: transactionValueUsd,
+        token_price_usd: parseFloat(pairData.priceUsd),
+      });
+
+      if (logError) {
+        console.error("Failed to log buy transaction:", logError);
+        toast.error("Could not save trade history.");
+      }
+      // --- END LOGGING ---
+
+      console.log(`Buying ${orderAmount} ${pairData?.baseToken.symbol}`);
       toast.success(
-        `Swapped ${orderAmount} XSol to ${tokenAmount} ${pairData?.baseToken.symbol} `,
+        `Swapped ${orderAmount} XSol to ${tokenAmount.toFixed(4)} ${pairData?.baseToken.symbol} `,
         {
           action: {
             label: "View Transaction",
@@ -529,11 +540,7 @@ export default function TradingInterface() {
       toast.warning(error instanceof Error ? error.message : "Transaction might have failed");
       console.log(error);
     } finally {
-      if (updateBal) {
-        setUpdateBal(false);
-      } else {
-        setUpdateBal(true);
-      }
+      setUpdateBal(!updateBal);
       setLoading(false);
     }
   };
@@ -547,30 +554,42 @@ export default function TradingInterface() {
       if (!walletPublicKey) {
         throw new Error("Please connect your wallet!");
       }
-      console.log(pairData.baseToken);
-      const price = parseFloat(parseFloat(pairData.priceNative).toFixed(9));
-      const xSolAmount =
-        +orderAmount * parseFloat(parseFloat(pairData.priceNative).toFixed(9));
+
+      const xSolAmount = +orderAmount * parseFloat(pairData.priceNative);
+      const transactionValueUsd = +orderAmount * parseFloat(pairData.priceUsd);
+
       const sellNow = await sell(
         xSolAmount,
         walletPublicKey,
         pairData.baseToken.address,
         +orderAmount,
-        // sendTransaction
       );
-      if (!connection) return;
-      // Send the transaction
+
+      if (!connection || !walletProvider) return;
       const signature = await walletProvider.sendTransaction(sellNow, connection);
 
-      // Confirm the transaction
-      // const confirmation = await connection.confirmTransaction(signature, 'confirmed');
-    
-      console.log(sellNow);
-      console.log(
-        `Selling ${orderAmount} ${pairData?.baseToken.symbol} at ${price}`
-      );
+      // --- LOG TRADE TO SUPABASE ---
+      const { error: logError } = await supabase.from('trade_history').insert({
+          user_wallet: walletPublicKey.toBase58(),
+          trade_type: 'sell',
+          base_token_mint: pairData.baseToken.address,
+          base_token_symbol: pairData.baseToken.symbol,
+          base_token_amount: +orderAmount,
+          quote_token_symbol: 'XSOL',
+          quote_token_amount: xSolAmount,
+          transaction_value_usd: transactionValueUsd,
+          token_price_usd: parseFloat(pairData.priceUsd),
+      });
+
+      if (logError) {
+          console.error("Failed to log sell transaction:", logError);
+          toast.error("Could not save trade history.");
+      }
+      // --- END LOGGING ---
+
+      console.log(`Selling ${orderAmount} ${pairData?.baseToken.symbol}`);
       toast.success(
-        `Swapped ${orderAmount} ${pairData?.baseToken.symbol} to ${xSolAmount} XSol `,
+        `Swapped ${orderAmount} ${pairData?.baseToken.symbol} to ${xSolAmount.toFixed(4)} XSol `,
         {
           action: {
             label: "View Transaction",
@@ -582,15 +601,10 @@ export default function TradingInterface() {
       toast.warning(error instanceof Error ? error.message : "Transaction might have failed");
       console.log(error);
     } finally {
-      if (updateBal) {
-        setUpdateBal(false);
-      } else {
-        setUpdateBal(true);
-      }
+      setUpdateBal(!updateBal);
       setLoading(false);
     }
   };
-
   const formatNumber = (num: number) => {
     return num.toLocaleString("en-US", { maximumFractionDigits: 0 });
   };
