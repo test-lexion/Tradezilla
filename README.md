@@ -1,4 +1,3 @@
-
 ![WhatsApp Image 2024-10-01 at 10 59 39 PM](https://github.com/user-attachments/assets/4f16a0ea-e3cd-484a-8966-9271540f2900)
 
 # XDEGEN Platform
