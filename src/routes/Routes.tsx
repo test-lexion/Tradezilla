@@ -1,30 +1,55 @@
+import React, { Suspense, lazy } from "react";
 import Layout from "../components/dashboard/layout";
-import NotFound from "../not-found";
-import SetBalancePage from "../Pages/balance/funds";
-import ComingSoon from "../Pages/comingSoon/coming";
-import DocsPage from "../Pages/docs/docs";
-import HomePage from "../Pages/home/home";
-import Landing from "../Pages/landing/Landing";
-import NewPair from "../Pages/pairs/NewPairs";
-import PnlPage from "../Pages/pnl/page";
-import SettingPage from "../Pages/setting/settings";
-// import SwapPage from "../Pages/swap/Swap";
-import TradingPage from "../Pages/trading/TradingPage";
+import { Skeleton } from "../components/ui/skeleton";
+
+// Lazy load all the page components
+const Landing = lazy(() => import("../Pages/landing/Landing"));
+const HomePage = lazy(() => import("../Pages/home/home"));
+const SetBalancePage = lazy(() => import("../Pages/balance/funds"));
+const NewPair = lazy(() => import("../Pages/pairs/NewPairs"));
+const PnlPage = lazy(() => import("../Pages/pnl/page"));
+const TradingPage = lazy(() => import("../Pages/trading/TradingPage"));
+const ComingSoon = lazy(() => import("../Pages/comingSoon/coming"));
+const SettingPage = lazy(() => import("../Pages/setting/settings"));
+const DocsPage = lazy(() => import("../Pages/docs/docs"));
+const NotFound = lazy(() => import("../not-found"));
+
+// A simple loading component to show while pages are loading
+const PageLoader = () => (
+  <div className="w-full h-screen p-6">
+    <Skeleton className="h-24 w-full mb-4" />
+    <div className="space-y-2">
+      <Skeleton className="h-12 w-full" />
+      <Skeleton className="h-12 w-full" />
+      <Skeleton className="h-12 w-full" />
+    </div>
+  </div>
+);
 
 const appRoutes = [
   {
     path: "*",
-    element: <NotFound />,
-  },
-  {
-    path: "/",
-    element: <Landing />,
+    element: (
+      <Suspense fallback={<PageLoader />}>
+        <NotFound />
+      </Suspense>
+    ),
   },
   {
     path: "/",
     element: (
+      <Suspense fallback={<PageLoader />}>
+        <Landing />
+      </Suspense>
+    ),
+  },
+  {
+    path: "/home", // Explicitly define home route
+    element: (
       <Layout>
-        <HomePage />
+        <Suspense fallback={<PageLoader />}>
+          <HomePage />
+        </Suspense>
       </Layout>
     ),
   },
@@ -32,21 +57,19 @@ const appRoutes = [
     path: "/funds",
     element: (
       <Layout>
-        <SetBalancePage />
+        <Suspense fallback={<PageLoader />}>
+          <SetBalancePage />
+        </Suspense>
       </Layout>
     ),
   },
-  // {
-  //   path: "/swap",
-  //   element: (
-  //     <SwapPage />
-  //   ),
-  // },
   {
     path: "/trade",
     element: (
       <Layout>
-        <NewPair />
+        <Suspense fallback={<PageLoader />}>
+          <NewPair />
+        </Suspense>
       </Layout>
     ),
   },
@@ -54,7 +77,9 @@ const appRoutes = [
     path: "/pnl",
     element: (
       <Layout>
-        <PnlPage />
+        <Suspense fallback={<PageLoader />}>
+          <PnlPage />
+        </Suspense>
       </Layout>
     ),
   },
@@ -62,7 +87,9 @@ const appRoutes = [
     path: "/trading/:id",
     element: (
       <Layout>
-        <TradingPage />
+        <Suspense fallback={<PageLoader />}>
+          <TradingPage />
+        </Suspense>
       </Layout>
     ),
   },
@@ -70,7 +97,9 @@ const appRoutes = [
     path: "/swaps",
     element: (
       <Layout>
-        <ComingSoon />
+        <Suspense fallback={<PageLoader />}>
+          <ComingSoon />
+        </Suspense>
       </Layout>
     ),
   },
@@ -78,7 +107,9 @@ const appRoutes = [
     path: "/settings",
     element: (
       <Layout>
-        <SettingPage />
+        <Suspense fallback={<PageLoader />}>
+          <SettingPage />
+        </Suspense>
       </Layout>
     ),
   },
@@ -86,7 +117,9 @@ const appRoutes = [
     path: "/docs",
     element: (
       <Layout>
-        <DocsPage />
+        <Suspense fallback={<PageLoader />}>
+          <DocsPage />
+        </Suspense>
       </Layout>
     ),
   },
