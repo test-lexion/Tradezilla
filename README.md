@@ -4,7 +4,6 @@ Welcome to **XDEGEN** – a revolutionary demo trading platform designed to teac
 
 ![intro](https://github.com/user-attachments/assets/4ad84369-ecde-4647-8cf3-9f8fc7fec511)
 
-
 ## Overview
 
 **XDEGEN** is a platform where users can experience the excitement and challenge of trading in the decentralized world. Whether you're a beginner or an experienced trader, XDEGEN provides a demo environment for users to:
