@@ -1,7 +1,6 @@
 ![WhatsApp Image 2024-10-01 at 10 59 39 PM](https://github.com/user-attachments/assets/4f16a0ea-e3cd-484a-8966-9271540f2900)
 # XDEGEN Platform
 Welcome to **XDEGEN** – a revolutionary demo trading platform designed to teach and empower crypto traders, especially in the DeFi and Degen space. XDEGEN simulates real-world crypto trading scenarios with virtual assets, enabling users to learn trading strategies without the risk of using real funds
-
 ![intro](https://github.com/user-attachments/assets/4ad84369-ecde-4647-8cf3-9f8fc7fec511)
 
 ## Overview
