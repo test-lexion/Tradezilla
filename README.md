@@ -91,4 +91,3 @@ Please ensure that your code is well-documented and follows the established styl
 
 Thank you for being part of the XDEGEN journey! We can't wait to see you thrive in the DeFi and Degen trading space!
 ![WhatsApp Image 2024-10-01 at 10 59 39 PM](https://github.com/user-attachments/assets/2a0b8fee-3424-46e7-8bbe-12ee1ed5c7bc)
-
